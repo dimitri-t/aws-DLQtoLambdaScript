@@ -62,7 +62,7 @@ const main = async () => {
                     console.log('Lambda succesfully invoked\nDeleting Message from the Queue');
 
                     const deleteMessageParams = {
-                        QueueUrl: `https://sqs.ap-southeast-2.amazonaws.com/${accountId}/${queueName}`,
+                        QueueUrl: `https://sqs.${awsRegion}.amazonaws.com/${accountId}/${queueName}`,
                         ReceiptHandle: currMessage.ReceiptHandle!
                     };
 
