@@ -1,0 +1,24 @@
+{
+  "name": "aws-testing",
+  "version": "1.0.1",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^17.0.2",
+    "typescript": "^4.5.3"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1046.0"
+  }
+}
