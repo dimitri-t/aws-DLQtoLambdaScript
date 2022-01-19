@@ -1,3 +1,5 @@
+//TODO Pull the params from temacity environment variables
+
 import * as AWS from 'aws-sdk';
 
 // Handle command line args for region, queue, lambda
@@ -9,7 +11,7 @@ const queueName = process.argv[4];
 const lambdaName = process.argv[5];
 
 AWS.config.update({ region: awsRegion });
-
+console.log(accountId, awsRegion, queueName, lambdaName)
 // Create SQS service client
 const sqs = new AWS.SQS({ apiVersion: '2012-11-05' });
 
@@ -30,6 +32,7 @@ const main = async () => {
         MaxNumberOfMessages: 10,
         VisibilityTimeout: 40,
         WaitTimeSeconds: 15,
+        AttributeNames: ['All']
     };
 
     let Messages = (await sqs.receiveMessage(receiveMessageRequest).promise()).Messages;
@@ -42,6 +45,7 @@ const main = async () => {
 
         // For each Message invoke lambda fnc
         for (const currMessage of Messages) {
+            console.log(currMessage);
 
             console.log('Received: MessageID ', currMessage.MessageId);
 
@@ -50,8 +54,6 @@ const main = async () => {
                     FunctionName: lambdaName, /* required */
                     InvocationType: 'Event',
                     Payload: JSON.stringify(currMessage.Body),
-                    // ClientContext: 'STRING_VALUE',
-                    // Qualifier: 'STRING_VALUE'
                 }
                 console.log('Invoking Lambda Function: ', lambdaInvocationParams.FunctionName, ' with Payload ', lambdaInvocationParams.Payload);
 
