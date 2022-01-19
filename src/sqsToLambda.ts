@@ -12,6 +12,10 @@ const lambdaName = process.argv[5];
 
 AWS.config.update({ region: awsRegion });
 console.log(accountId, awsRegion, queueName, lambdaName)
+console.log(process.argv);
+console.log(process.env);
+
+
 // Create SQS service client
 const sqs = new AWS.SQS({ apiVersion: '2012-11-05' });
 
