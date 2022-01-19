@@ -1,20 +1,13 @@
-//TODO Pull the params from temacity environment variables
-
 import * as AWS from 'aws-sdk';
 
 // Handle command line args for region, queue, lambda
-if (process.argv.length !== 6) throw ('Usage:\n    script <accountID> <awsRegion> <dlqName> <lambdaName>');
+if (process.argv.length !== 5) throw ('Usage:\n    script <awsRegion> <dlqName> <lambdaName>');
 
-const accountId = process.argv[2];
-const awsRegion = process.argv[3]
-const queueName = process.argv[4];
-const lambdaName = process.argv[5];
+const awsRegion = process.argv[2]
+const queueName = process.argv[3];
+const lambdaName = process.argv[4];
 
 AWS.config.update({ region: awsRegion });
-console.log(accountId, awsRegion, queueName, lambdaName)
-console.log(process.argv);
-console.log(process.env);
-
 
 // Create SQS service client
 const sqs = new AWS.SQS({ apiVersion: '2012-11-05' });
@@ -23,6 +16,17 @@ const sqs = new AWS.SQS({ apiVersion: '2012-11-05' });
 const lambda = new AWS.Lambda({ apiVersion: '2015-03-31' });
 
 const main = async () => {
+
+    // Get Queue URL
+    const getQueueUrlParams = {
+        QueueName: queueName
+    };
+    let queueUrl = (await (await sqs.getQueueUrl(getQueueUrlParams).promise()).QueueUrl);
+    if (!queueUrl) {
+        console.log("Didn't find a queue URL for the specified SQS Queue");
+        return;
+    }
+
     // Keeping track of how many messages we pull and process
     let totalMessagesReceived = 0;
     let totalMessagesReprocessed = 0;
@@ -32,7 +36,7 @@ const main = async () => {
 
     // Params for receiving a message from SQS
     const receiveMessageRequest = {
-        QueueUrl: `https://sqs.${awsRegion}.amazonaws.com/${accountId}/${queueName}`,
+        QueueUrl: queueUrl!,
         MaxNumberOfMessages: 10,
         VisibilityTimeout: 40,
         WaitTimeSeconds: 15,
@@ -68,7 +72,7 @@ const main = async () => {
                     console.log('Lambda succesfully invoked\nDeleting Message from the Queue');
 
                     const deleteMessageParams = {
-                        QueueUrl: `https://sqs.${awsRegion}.amazonaws.com/${accountId}/${queueName}`,
+                        QueueUrl: queueUrl!,
                         ReceiptHandle: currMessage.ReceiptHandle!
                     };
 
