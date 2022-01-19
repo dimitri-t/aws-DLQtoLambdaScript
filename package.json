@@ -3,9 +3,9 @@
   "version": "1.0.1",
   "description": "",
   "main": "index.js",
-  "types": "dist/index.d.ts",
+  "types": "built/index.d.ts",
   "files": [
-    "/dist"
+    "/built"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
