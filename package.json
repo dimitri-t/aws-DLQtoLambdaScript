@@ -2,8 +2,8 @@
   "name": "sqstolambdascript",
   "version": "1.0.1",
   "description": "",
-  "main": "index.js",
-  "types": "built/index.d.ts",
+  "main": "built/sqsToLambda.js",
+  "types": "built/sqsToLambda.d.ts",
   "files": [
     "/built"
   ],

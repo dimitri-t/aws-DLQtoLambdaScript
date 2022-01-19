@@ -1,11 +1,13 @@
 import * as AWS from 'aws-sdk';
 
-// Handle command line args for region, queue, lambda
-if (process.argv.length !== 5) throw ('Usage:\n    script <awsRegion> <dlqName> <lambdaName>');
+// Get inputs from ENV variables
+const awsRegion = process.env.AWS_REGION!;
+const queueName = process.env.SQS_NAME!;
+const lambdaName = process.env.LAMBDA_NAME!;
 
-const awsRegion = process.argv[2]
-const queueName = process.argv[3];
-const lambdaName = process.argv[4];
+// const awsRegion = 'ap-southeast-2';
+// const queueName = 'testQueue';
+// const lambdaName = 'testLambda';
 
 AWS.config.update({ region: awsRegion });
 
@@ -16,6 +18,8 @@ const sqs = new AWS.SQS({ apiVersion: '2012-11-05' });
 const lambda = new AWS.Lambda({ apiVersion: '2015-03-31' });
 
 const main = async () => {
+
+    console.log(`Executing script with the following inputs\nAWS Region: ${awsRegion}\nSQS Queue: ${queueName}\nLambda Function: ${lambdaName}\n`);
 
     // Get Queue URL
     const getQueueUrlParams = {
@@ -32,9 +36,11 @@ const main = async () => {
     let totalMessagesReprocessed = 0;
     const failedMessages = [];
 
-    console.log('Fetching Messages from SQS Queue \n');
+    console.log(`Fetching Messages from SQS Queue \nSQS URL - ${queueUrl}\n`);
 
     // Params for receiving a message from SQS
+
+    //      Do we want these params as ENV Variables???
     const receiveMessageRequest = {
         QueueUrl: queueUrl!,
         MaxNumberOfMessages: 10,
@@ -53,13 +59,14 @@ const main = async () => {
 
         // For each Message invoke lambda fnc
         for (const currMessage of Messages) {
-            console.log(currMessage);
+            console.log(`MessageID: ${currMessage.MessageId}`);
+            console.log(`Message Body: ${currMessage.Body}`);
 
-            console.log('Received: MessageID ', currMessage.MessageId);
-
+            // Invoke Lambda Function with the body of the current message
+            // If it is succesfully invoked, delete it from the queue
             try {
                 const lambdaInvocationParams = {
-                    FunctionName: lambdaName, /* required */
+                    FunctionName: lambdaName,
                     InvocationType: 'Event',
                     Payload: JSON.stringify(currMessage.Body),
                 }
@@ -76,8 +83,8 @@ const main = async () => {
                         ReceiptHandle: currMessage.ReceiptHandle!
                     };
 
-                    const deleteResponse = await sqs.deleteMessage(deleteMessageParams).promise();
-                    console.log('Message deleted succesfully\n\n', deleteResponse);
+                    await sqs.deleteMessage(deleteMessageParams).promise();
+                    console.log('Message deleted succesfully\n');
 
                     totalMessagesReprocessed++;
                 }
@@ -91,7 +98,7 @@ const main = async () => {
         }
         Messages = (await sqs.receiveMessage(receiveMessageRequest).promise()).Messages;
     }
-    console.log('\n\nTotal messages received: ', totalMessagesReceived);
+    console.log('Total messages received: ', totalMessagesReceived);
     console.log('Total messages reprocessed succesfully: ', totalMessagesReprocessed);
     console.log('Failed messages: ', failedMessages);
 }
