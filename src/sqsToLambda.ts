@@ -63,7 +63,6 @@ const main = async () => {
         for (const currMessage of Messages) {
 
             console.log(`MessageID: ${currMessage.MessageId}`);
-            console.log(currMessage);
             console.log(`Message Body: ${currMessage.Body}`);
 
             // Retrieve Message time sent or set it to a time after the process started
