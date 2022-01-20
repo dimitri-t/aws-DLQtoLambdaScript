@@ -58,17 +58,18 @@ const main = async () => {
         // For each Message invoke lambda fnc
         for (const currMessage of Messages) {
 
-            console.log(`MessageID: ${currMessage.MessageId}`);
-            console.log(`Message Body: ${currMessage.Body}`);
-
             // Retrieve Message time sent or set it to a time after the process started
             const messageTimeSent = currMessage.Attributes?.SentTimestamp ?
                 parseInt(currMessage.Attributes?.SentTimestamp)
                 : startTime + 1;
+
             if (messageTimeSent > startTime) {
-                console.warn(`Message ${currMessage.MessageId} will not be reprocessed - it was sent after reprocessing began`);
+                console.warn(`MessageID: ${currMessage.MessageId} will not be reprocessed - it was sent after reprocessing began`);
                 totalMessagesNotReprocessed++;
             } else {
+                console.log(`MessageID: ${currMessage.MessageId}`);
+                console.log(`Message Body: ${currMessage.Body}`);
+
                 // Invoke Lambda Function with the body of the current message
                 // If it is succesfully invoked, delete it from the queue
                 try {
