@@ -4,13 +4,9 @@ import * as AWS from 'aws-sdk';
 const awsRegion = process.env.AWS_REGION!;
 const queueName = process.env.SQS_NAME!;
 const lambdaName = process.env.LAMBDA_NAME!;
-const MaxNumberOfMessages = process.env.SQS_MAX_NUM_MESSAGES!;
-const VisibilityTimeout = process.env.SQS_VISIBILITY_TIMEOUT!;
-const WaitTimeSeconds = process.env.SQS_WAIT_TIME_SECONDS!;
-
-// const awsRegion = 'ap-southeast-2';
-// const queueName = 'testQueue';
-// const lambdaName = 'testLambda';
+const MaxNumberOfMessages = parseInt(process.env.SQS_MAX_NUM_MESSAGES!);
+const VisibilityTimeout = parseInt(process.env.SQS_VISIBILITY_TIMEOUT!);
+const WaitTimeSeconds = parseInt(process.env.SQS_WAIT_TIME_SECONDS!);
 
 AWS.config.update({ region: awsRegion });
 
@@ -45,9 +41,9 @@ const main = async () => {
     // Params for receiving a message from SQS
     const receiveMessageRequest = {
         QueueUrl: queueUrl!,
-        MaxNumberOfMessages: 10,
-        VisibilityTimeout: 60,
-        WaitTimeSeconds: 15,
+        MaxNumberOfMessages: MaxNumberOfMessages,
+        VisibilityTimeout: VisibilityTimeout,
+        WaitTimeSeconds: WaitTimeSeconds,
         AttributeNames: ['All']
     };
 
