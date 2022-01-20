@@ -66,7 +66,7 @@ const main = async () => {
                 parseInt(currMessage.Attributes?.SentTimestamp)
                 : startTime + 1;
             if (messageTimeSent > startTime) {
-                console.warn(`Message was sent after reprocessing began: ${currMessage.MessageId}\nWill not reprocess this message`);
+                console.warn(`Message ${currMessage.MessageId} will not be reprocessed - it was sent after reprocessing began`);
                 totalMessagesNotReprocessed++;
             } else {
                 // Invoke Lambda Function with the body of the current message
@@ -108,6 +108,7 @@ const main = async () => {
     console.log('Total messages received: ', totalMessagesReceived);
     console.log('Total messages reprocessed succesfully: ', totalMessagesReprocessed);
     console.log('Total messages not reprocessed: ', totalMessagesNotReprocessed);
+    console.log('Total messages failed to be Invoked through the Lambda fnc: ', failedMessages.length);
     console.log('Failed messages: ', failedMessages);
 }
 
